@@ -14,7 +14,10 @@ def kalkulator():
     elif operacja == "*":
         print(num1 * num2)
     elif operacja == "/":
-        print(num1 / num2)
+        if num2 == 0:
+            print("Błąd: Dzielenie przez zero")
+            return
+        print(round(num1 / num2, 2))
     else:
         print("Błąd: Upewnij się że podane dane są poprawne")
 
@@ -72,7 +75,7 @@ def main():
         case 'X':
             return
         case _:
-            print("Nie podano liczb podzadania")
+            print("Nie podano numeru podzadania")
     main()
 
 if __name__ == '__main__':
