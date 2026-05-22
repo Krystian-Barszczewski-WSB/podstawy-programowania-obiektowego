@@ -4,7 +4,7 @@ def kalkulator():
         num2 = int(input("Podaj liczbę 2: "))
         operacja = input("Podaj operacje (+, -, *, /): ")
     except ValueError:
-        print("Podano błędne wartośći")
+        print("Błąd: Podano niepoprawne wartośći")
         return
 
     if operacja == "+":
@@ -16,14 +16,14 @@ def kalkulator():
     elif operacja == "/":
         print(num1 / num2)
     else:
-        print("Wystąpił błąd upewnij się że podane dane są poprawne")
+        print("Błąd: Upewnij się że podane dane są poprawne")
 
 def konwerter_temperatur():
     try:
         konwersja = input("Podaj z jakiego systemu konwertujesz(C/F): ")
         temperatura = int(input("Podaj temperature: "))
     except ValueError:
-        print("Podano błędne wartości")
+        print("Błąd: Podano niepoprawne wartości")
         return
 
     if konwersja == "C" or konwersja == "c":
@@ -35,13 +35,17 @@ def srednia_ocen():
     try:
         ilosc_ocen = int(input("Podaj ilość wprowadzanych ocen: "))
     except ValueError:
-        print("Podano błędne wartości")
+        print("Błąd: Podano niepoprawne wartości")
         return
 
     srednia = 0
 
     for x in range(ilosc_ocen):
-        srednia += int(input("Podaj ocene nr " + str(x + 1) + ": "))
+        try:
+            srednia += int(input("Podaj ocene nr " + str(x + 1) + ": "))
+        except ValueError:
+            print("Błąd: Nie podano liczby")
+            return
 
     srednia /= ilosc_ocen
 
