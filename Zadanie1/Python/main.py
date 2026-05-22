@@ -31,8 +31,10 @@ def konwerter_temperatur():
 
     if konwersja == "C" or konwersja == "c":
         print(str(round((temperatura * 1.8) + 32, 2)) + " F*")
-    else:
+    elif konwersja == "F" or konwersja == "f":
         print(str(round((temperatura - 32) / 1.8, 2)) + " C*")
+    else:
+        print("Błąd: Niepoprawny system temperatury")
 
 def srednia_ocen():
     try:

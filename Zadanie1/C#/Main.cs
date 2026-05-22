@@ -28,8 +28,8 @@ public class Program
 					Console.WriteLine("Błąd: Dzielenie przez zero");
 					return;
 				}
-				
-				Console.WriteLine((double)num1 / num2); 
+
+				Console.WriteLine((double)num1 / num2);
 			}
 			else
 				Console.WriteLine("Błąd: Upewnij się że podane dane są poprawne");
@@ -55,10 +55,14 @@ public class Program
 				double wynik = Math.Round((temperatura * 1.8) + 32, 2);
 				Console.WriteLine($"{wynik} F*");
 			}
-			else
+			else if (konwersja == "F" || konwersja == "f")
 			{
 				double wynik = Math.Round((temperatura - 32) / 1.8, 2);
 				Console.WriteLine($"{wynik} C*");
+			}
+			else
+			{
+				Console.WriteLine("Błąd: Niepoprawny system temperatury");
 			}
 		}
 		catch (FormatException)
