@@ -18,7 +18,7 @@ def kalkulator():
     else:
         print("Wystąpił błąd upewnij się że podane dane są poprawne")
 
-def konwerterTemperatur():
+def konwerter_temperatur():
     try:
         konwersja = input("Podaj z jakiego systemu konwertujesz(C/F): ")
         temperatura = int(input("Podaj temperature: "))
@@ -31,13 +31,35 @@ def konwerterTemperatur():
     else:
         print(str(round((temperatura - 32) / 1.8, 2)) + " C*")
 
+def srednia_ocen():
+    try:
+        ilosc_ocen = int(input("Podaj ilość wprowadzanych ocen: "))
+    except ValueError:
+        print("Podano błędne wartości")
+        return
+
+    srednia = 0
+
+    for x in range(ilosc_ocen):
+        srednia += int(input("Podaj ocene nr " + str(x + 1) + ": "))
+
+    srednia /= ilosc_ocen
+
+    print("Średnia wynosi: " + str(srednia))
+    if srednia >= 3:
+        print("Uczeń zdał.")
+    else:
+        print("Uczeń nie zdał")
+
 def main():
     choice = input("Wybierz podzadanie: ")
     match choice:
         case '1':
             kalkulator()
         case '2':
-            konwerterTemperatur()
+            konwerter_temperatur()
+        case '3':
+            srednia_ocen()
         case _:
             print("Nie podano liczb podzadania")
 
