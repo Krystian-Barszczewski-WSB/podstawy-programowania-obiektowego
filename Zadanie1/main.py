@@ -42,14 +42,17 @@ def srednia_ocen():
 
     for x in range(ilosc_ocen):
         try:
-            srednia += int(input("Podaj ocene nr " + str(x + 1) + ": "))
+            ocena = 0
+            while ocena <= 0 or ocena > 6:
+                ocena = int(input("Podaj ocene(1-6) nr " + str(x + 1) + ": "))
+            srednia += ocena
         except ValueError:
             print("Błąd: Nie podano liczby")
             return
 
     srednia /= ilosc_ocen
 
-    print("Średnia wynosi: " + str(srednia))
+    print("Średnia wynosi: " + str(round(srednia,2)))
     if srednia >= 3:
         print("Uczeń zdał.")
     else:
