@@ -103,27 +103,29 @@ public class Program
 
 	public static void Main()
 	{
-		Console.Write("Wybierz podzadanie(1 - kalkulator, 2 - konwersja temperatur, 3 - srednia ocen, x - wyjscie z programu): ");
-		string choice = Console.ReadLine();
+	    while (true)
+	    {
+            Console.Write("Wybierz podzadanie(1 - kalkulator, 2 - konwersja temperatur, 3 - srednia ocen, x - wyjscie z programu): ");
+            string choice = Console.ReadLine();
 
-		switch (choice)
-		{
-			case "1":
-				Kalkulator();
-				break;
-			case "2":
-				KonwerterTemperatur();
-				break;
-			case "3":
-				SredniaOcen();
-				break;
-			case "x":
-			case "X":
-				return;
-			default:
-				Console.WriteLine("Nie podano numeru podzadania");
-				break;
-		}
-		Main();
+            switch (choice)
+            {
+                case "1":
+                    Kalkulator();
+                    break;
+                case "2":
+                    KonwerterTemperatur();
+                    break;
+                case "3":
+                    SredniaOcen();
+                    break;
+                case "x":
+                case "X":
+                    return;
+                default:
+                    Console.WriteLine("Nie podano numeru podzadania");
+                    break;
+            }
+        }
 	}
 }

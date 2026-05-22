@@ -62,21 +62,21 @@ def srednia_ocen():
         print("Uczeń nie zdał")
 
 def main():
-    choice = input("Wybierz podzadanie(1 - kalkulator, 2 - konwersja tmeperatur, 3 - srednia ocen, x - wyjscie z programu): ")
-    match choice:
-        case '1':
-            kalkulator()
-        case '2':
-            konwerter_temperatur()
-        case '3':
-            srednia_ocen()
-        case 'x':
-            return
-        case 'X':
-            return
-        case _:
-            print("Nie podano numeru podzadania")
-    main()
+    while True:
+        choice = input("Wybierz podzadanie(1 - kalkulator, 2 - konwersja tmeperatur, 3 - srednia ocen, x - wyjscie z programu): ")
+        match choice:
+            case '1':
+                kalkulator()
+            case '2':
+                konwerter_temperatur()
+            case '3':
+                srednia_ocen()
+            case 'x':
+                return
+            case 'X':
+                return
+            case _:
+                print("Nie podano numeru podzadania")
 
 if __name__ == '__main__':
     main()
