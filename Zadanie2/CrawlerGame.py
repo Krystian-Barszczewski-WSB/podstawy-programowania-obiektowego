@@ -1,6 +1,8 @@
 #Gra Dungeon crawler (podziemia) – klasy Hero, Monster, Room, Item, Dungeon;
 # przemieszczanie się między pomieszczeniami, walka, zbieranie skarbów.
 import random
+from tkinter.tix import InputOnly
+
 
 class Dungeon:
     def __init__(self, max_rooms = 10):
@@ -20,7 +22,7 @@ class Dungeon:
         print(self.rooms.keys())
         print(len(self.rooms))
 
-    def generate_map(self):
+    def generate_map(self, hero_pos = (0, 0)):
         xs = [pos[0] for pos in self.rooms]
         ys = [pos[1] for pos in self.rooms]
 
@@ -30,10 +32,10 @@ class Dungeon:
         for y in range(max_y, min_y - 1, -1):
             for x in range(min_x, max_x + 1):
                 if (x, y) in self.rooms:
-                    if self.rooms[(x, y)].monsters:
-                        print("▲", end=" ")
-                    elif (x, y) == (0,0):
+                    if (x, y) == hero_pos:
                         print("◯", end=" ")
+                    elif self.rooms[(x, y)].monsters:
+                        print("▲", end=" ")
                     else:
                         print("■", end=" ")
                 else:
@@ -61,7 +63,7 @@ class Room:
         if len(rooms) >= max_rooms:
             return
 
-        for pos in [(-1,0), (0,1), (1,0), (0,-1)]:
+        for pos in [(-1, 0), (0, 1), (1, 0), (0, -1)]:
             new_pos = (self.x + pos[0], self.y + pos[1])
             if new_pos in rooms:
                 continue
@@ -101,12 +103,13 @@ class Goblin(Monster):
 
 
 class Hero:
-    def __init__(self, hp, dmg, start_room):
+    def __init__(self, hp, dmg, rooms):
         self._hp = hp
         self.dmg = dmg
         self.inventory = []
         self._gold = 0
-        self.current_room = start_room
+        self.rooms = rooms
+        self.current_room = rooms[(0, 0)]
 
     @property
     def gold(self):
@@ -132,7 +135,50 @@ class Hero:
             print("Game Over")
 
     def move(self):
-        pass
+        if self.current_room.monsters:
+            print("A monster is blocking your path!")
+            return
+
+        print("You can move to room(s):", end=" ")
+        self.current_room.generate_rooms(self.rooms, self._gold)
+        possible_directions = []
+
+        for pos in [(-1, 0), (0, 1), (1, 0), (0, -1)]:
+            new_pos = (self.current_room.x + pos[0], self.current_room.y + pos[1])
+
+            if new_pos in self.rooms:
+                match pos:
+                    case (0, 1):
+                        print("N-orth,", end=" ")
+                    case (0, -1):
+                        print("S-outh,", end=" ")
+                    case (1, 0):
+                        print("E-ast,", end=" ")
+                    case (-1, 0):
+                        print("W-est,", end=" ")
+                possible_directions.append(pos)
+
+        print()
+        direction = input("Which direction would you like to move to? ").upper()
+        match direction:
+            case "N":
+                if (0, 1) in possible_directions:
+                    self.current_room = self.rooms[(self.current_room.x, self.current_room.y + 1)]
+                else: print("Can't go there.")
+            case "S":
+                if (0, -1) in possible_directions:
+                    self.current_room = self.rooms[(self.current_room.x, self.current_room.y - 1)]
+                else: print("Can't go there.")
+            case "E":
+                if (1, 0) in possible_directions:
+                    self.current_room = self.rooms[(self.current_room.x + 1, self.current_room.y)]
+                else: print("Can't go there.")
+            case "W":
+                if (-1, 0) in possible_directions:
+                    self.current_room = self.rooms[(self.current_room.x - 1, self.current_room.y)]
+                else: print("Can't go there.")
+
+
 
     def attack(self, monster):
         monster.hp -= self.dmg
