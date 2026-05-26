@@ -1,6 +1,4 @@
-from unittest import case
-
-from Zadanie2.CrawlerGame import Hero, Monster, Goblin, Dungeon
+from Zadanie2.CrawlerGame import Hero, Dungeon
 
 def main():
     dungeon = Dungeon()
