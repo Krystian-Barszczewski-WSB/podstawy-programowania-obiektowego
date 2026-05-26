@@ -42,7 +42,7 @@ class Dungeon:
 
 class Room:
     def __init__(self, x, y):
-        self.loot = []
+        self.loot = None
         self.monster = None
         self.x = x
         self.y = y
@@ -50,10 +50,16 @@ class Room:
         #self.generate()
 
     def generate(self):
-        if random.random() < 0.3:
-            self.loot = Item("HP Potion", "Heals the users wounds")
+        if random.random() < 0.4:
+            self.loot = HPPotion()
+        elif random.random() < 0.6:
+            self.loot = Bomb()
+
         if random.random() < 0.6:
-            self.monster = Goblin()
+            if random.random() < 0.5:
+                self.monster = Goblin()
+            else:
+                self.monster = Wolf()
 
     def generate_rooms(self, rooms, max_rooms):
         if len(rooms) >= max_rooms:
@@ -69,7 +75,6 @@ class Room:
                 rooms[new_pos].generate()
                 rooms[new_pos].generate_rooms(rooms, max_rooms)
 
-
 class Monster:
     def __init__(self, name, hp, dmg, gold_drop):
         self.name = name
@@ -84,9 +89,6 @@ class Monster:
     @hp.setter
     def hp(self, value):
         self._hp = value
-
-        if self._hp <= 0:
-            del self
 
     def attack(self, hero):
         hero.hp -= self.dmg
@@ -124,9 +126,22 @@ class Dragon(Monster):
             self.counter += 1
         elif self.counter > 0:
             self.counter = 0
-            print(f"FDragon breaths fire on you dealing 40 damage!")
+            print(f"Dragon breathes fire on you dealing 40 damage!")
             hero.hp -= 40
 
+class Wolf(Monster):
+    def __init__(self):
+        super().__init__(
+            name="Wolf",
+            hp=25,
+            dmg=10,
+            gold_drop=100
+        )
+
+    def use_skill(self, hero):
+        how_much = random.randint(5, 15)
+        print(f"Wolf howls making it's HP grow by {how_much}!")
+        self.hp += how_much
 
 class Hero:
     def __init__(self, hp, dmg, dungeon):
@@ -138,6 +153,8 @@ class Hero:
         self.rooms = dungeon.rooms
         self.current_room = dungeon.rooms[(0, 0)]
         self.is_defending = False
+        self.kills = 0
+        self.has_won = False
 
     @property
     def gold(self):
@@ -167,14 +184,12 @@ class Hero:
         self.is_defending = False
 
     def action_menu(self):
-        choice = input("Choose your action (M-ove, C-heck, F-fight, L-oot, S-tatus): ").upper()
+        choice = input("Choose your action (M-ove, F-fight, L-oot, S-tatus): ").upper()
 
         match choice:
             case "M":
                 self.move()
                 self.dungeon.generate_map((self.current_room.x, self.current_room.y))
-            case "C":
-                pass
             case "F":
                 if self.current_room.monster:
                     self.attack(self.current_room.monster)
@@ -186,7 +201,7 @@ class Hero:
                 print("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
                 print(f"  HP: {self.hp}")
                 print(f"  Gold: {self.gold}")
-                print(f"  Items: {self.inventory}")
+                print(f"  Items: {[item.name for item in self.inventory]}")
                 print("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
 
     def move(self):
@@ -195,7 +210,6 @@ class Hero:
             return
 
         print("You can move to room(s):", end=" ")
-        self.current_room.generate_rooms(self.rooms, self._gold)
         possible_directions = []
 
         for pos in [(-1, 0), (0, 1), (1, 0), (0, -1)]:
@@ -214,6 +228,7 @@ class Hero:
                 possible_directions.append(pos)
 
         print()
+        self.dungeon.generate_map((self.current_room.x, self.current_room.y))
         direction = input("Which direction would you like to move to? ").upper()
         match direction:
             case "N":
@@ -236,10 +251,10 @@ class Hero:
     def attack(self, monster):
         while monster.hp > 0 and self.hp > 0:
             print("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
-            print(f"  {monster.name}: {monster.hp} HP")
-            print(f"  You: {self.hp} HP")
-            print(f"  A-ttack   C-check")
-            print(f"  D-efend   I-tems")
+            print(f"   {monster.name}: {monster.hp} HP")
+            print(f"   You: {self.hp} HP")
+            print(f"   A-ttack   C-check")
+            print(f"   D-efend   I-tems")
             print("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
 
             choice = input("Choose your action: ").upper()
@@ -254,7 +269,24 @@ class Hero:
                     print(f"You defend yourself making the incoming attack deal {monster.dmg * 0.5} (50%) less damage!")
                     self.is_defending = True
                 case "I":
-                    print(self.inventory)
+                    if not self.inventory:
+                        print("Inventory is empty")
+                        continue
+
+                    for i, item in enumerate(self.inventory, 1):
+                        print(f"{i}. {item.name}")
+
+                    print(f"{len(self.inventory) + 1}. Exit Inventory")
+
+                    choice = int(input("What do you want to do? "))
+
+                    if choice == len(self.inventory) + 1:
+                        continue
+
+                    item = self.inventory[choice - 1]
+                    item.use(self)
+
+                    self.inventory.remove(item)
 
             if monster.hp > 0:
                 if random.random() < 0.25:
@@ -265,18 +297,61 @@ class Hero:
                     monster.attack(self)
             else:
                 print(f"{monster.name} has been defeated!")
+                print(f"Obtained {monster.gold_drop} gold!")
+                self.gold += monster.gold_drop
+                self.kills += 1
 
         if self.hp > 0:
-            print("You won!")
+            if isinstance(monster, Dragon):
+                print("You Have slain the boss!")
+                self.has_won = True
+                self.current_room.monster = None
+                return
+            print("You won the battle!")
             self.current_room.monster = None
         else:
             print("You lost!")
 
     def check_room(self, room):
+        if not room.loot:
+            print("You check the room... but find nothing")
+            return
+
         print("You check the room for items and find: ")
-        print(room.loot)
+        print(room.loot.name + " - " + room.loot.description)
+        choice = input("Do you want to pick it up? (Y/N) ").upper()
+        if choice == "Y":
+            self.inventory.append(room.loot)
+            room.loot = None
+        else:
+            print("You left it.")
 
 class Item:
     def __init__(self, name, description):
         self.name = name
         self.description = description
+
+    def use(self, hero):
+        pass
+
+class HPPotion(Item):
+    def __init__(self):
+        super().__init__(
+            "HP Potion",
+            "Heals the users wounds"
+        )
+
+    def use(self, hero):
+        hero.hp += 35
+        print(f"You healed 35 HP!")
+
+class Bomb(Item):
+    def __init__(self):
+        super().__init__(
+            "Bomb",
+            "Deals big damage to enemies"
+        )
+
+    def use(self, hero):
+        hero.current_room.monster.hp -= 40
+        print(f"You dealt 40 damage to the monster!")
