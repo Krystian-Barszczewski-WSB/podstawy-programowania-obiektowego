@@ -61,6 +61,8 @@ class Order:
         self.product.remove_stock(self.quantity)
 
 def main():
+    magazyn = Warehouse(1, "Magazyn Ogólny")
+
     mleko = FoodProd(1, "mleko", 1, "21.07.2026")
     mleko.add_stock(5)
 
@@ -68,7 +70,6 @@ def main():
 
     jablko = FoodProd(2, "jabłko", 1, "25.08.2026")
 
-    magazyn = Warehouse(0, "Magazyn 1")
     magazyn.add_product(mleko)
     magazyn.add_product(telefon)
     magazyn.add_product(jablko)
